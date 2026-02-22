@@ -1,22 +1,122 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Website Deska</title>
+  <title>DESKA AI 👑</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      background: black;
+      margin: 0;
+      background: #0f0f0f;
       color: white;
-      text-align: center;
       font-family: Arial;
-      margin-top: 100px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
-    h1 {
-      color: cyan;
+
+    header {
+      background: #00f7ff;
+      color: black;
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    #chat {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .msg {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 80%;
+    }
+
+    .user {
+      background: #00f7ff;
+      color: black;
+      margin-left: auto;
+    }
+
+    .bot {
+      background: #222;
+    }
+
+    .input-area {
+      display: flex;
+      padding: 10px;
+      background: #111;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin-left: 5px;
+      border: none;
+      border-radius: 5px;
+      background: #00f7ff;
+      cursor: pointer;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>🔥 WEBSITE DESKA 🔥</h1>
-  <p>Website ini online dari GitHub Pages 🚀</p>
+
+<header>👑 DESKA AI CHAT 👑</header>
+
+<div id="chat"></div>
+
+<div class="input-area">
+  <input type="text" id="message" placeholder="Tanya apa aja...">
+  <button onclick="sendMessage()">Kirim</button>
+</div>
+
+<script>
+async function sendMessage() {
+  const input = document.getElementById("message");
+  const chat = document.getElementById("chat");
+  const text = input.value;
+
+  if (!text) return;
+
+  chat.innerHTML += `<div class="msg user">${text}</div>`;
+  input.value = "";
+
+  chat.innerHTML += `<div class="msg bot">Mengetik...</div>`;
+  chat.scrollTop = chat.scrollHeight;
+
+  const response = await fetch(
+    "https://api-inference.huggingface.co/models/google/flan-t5-base",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ inputs: text })
+    }
+  );
+
+  const data = await response.json();
+  document.querySelectorAll(".bot").forEach(e => {
+    if (e.innerText === "Mengetik...") {
+      e.innerText = data[0]?.generated_text || "AI tidak merespon.";
+    }
+  });
+
+  chat.scrollTop = chat.scrollHeight;
+}
+</script>
+
 </body>
 </html>
